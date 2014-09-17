@@ -40,6 +40,7 @@
 #include "ds.h"
 #include "read.h"
 #include "util.h"
+#include "gzstream.h" //bowhan
 
 /**
  * Classes and routines for reading reads from various input sources.
@@ -887,7 +888,14 @@ protected:
 			FILE *in;
 			if(infiles_[filecur_] == "-") {
 				in = stdin;
-			} else if((in = fopen(infiles_[filecur_].c_str(), "rb")) == NULL) {
+			} 
+			else if (infiles_[filecur_].substr(infiles_[filecur_].size()-3,3) == ".gz") { // bowhan
+				std::cerr << "[piPipes] gzipped input file" << std::endl;
+				fb_.newFile (new igzstream (infiles_[filecur_].c_str()));
+				++filecur_;
+				return;
+			} 
+			else if((in = fopen(infiles_[filecur_].c_str(), "rb")) == NULL) {
 				if(!errs_[filecur_]) {
 					cerr << "Warning: Could not open read file \"" << infiles_[filecur_].c_str() << "\" for reading; skipping..." << endl;
 					errs_[filecur_] = true;
@@ -895,6 +903,7 @@ protected:
 				filecur_++;
 				continue;
 			}
+			std::cerr << "[piPipes] text input file" << std::endl;
 			fb_.newFile(in);
 			return;
 		}

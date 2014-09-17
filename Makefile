@@ -83,7 +83,7 @@ else
 	PTHREAD_LIB = -lpthread
 endif
 
-LIBS = $(PTHREAD_LIB)
+LIBS = $(PTHREAD_LIB) -lz
 SEARCH_LIBS = 
 BUILD_LIBS = 
 INSPECT_LIBS =
@@ -97,7 +97,7 @@ SHARED_CPPS = ccnt_lut.cpp ref_read.cpp alphabet.cpp shmem.cpp \
               edit.cpp bt2_idx.cpp bt2_io.cpp bt2_util.cpp \
               reference.cpp ds.cpp multikey_qsort.cpp limit.cpp \
 			  random_source.cpp tinythread.cpp
-SEARCH_CPPS = qual.cpp pat.cpp sam.cpp \
+SEARCH_CPPS = qual.cpp pat.cpp gzstream.C sam.cpp \
               read_qseq.cpp aligner_seed_policy.cpp \
               aligner_seed.cpp \
 			  aligner_seed2.cpp \
@@ -146,7 +146,7 @@ SSE_FLAG=-msse2
 
 DEBUG_FLAGS    = -O0 -g3 -m64 $(SSE_FLAG)
 DEBUG_DEFS     = -DCOMPILER_OPTIONS="\"$(DEBUG_FLAGS) $(EXTRA_FLAGS)\""
-RELEASE_FLAGS  = -O3 -m64 $(SSE_FLAG) -funroll-loops -g3
+RELEASE_FLAGS  = -O3 -m64 $(SSE_FLAG) -funroll-loops -g3 -static
 RELEASE_DEFS   = -DCOMPILER_OPTIONS="\"$(RELEASE_FLAGS) $(EXTRA_FLAGS)\""
 NOASSERT_FLAGS = -DNDEBUG
 FILE_FLAGS     = -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE
@@ -166,6 +166,7 @@ BOWTIE2_BIN_LIST_AUX = bowtie2-build-s-debug \
 
 GENERAL_LIST = $(wildcard scripts/*.sh) \
                $(wildcard scripts/*.pl) \
+               $(wildcard third_party/*) \
                doc/manual.html \
                doc/README \
                doc/style.css \
@@ -197,16 +198,11 @@ SRC_PKG_LIST = $(wildcard *.h) \
                $(wildcard *.hh) \
                $(wildcard *.c) \
                $(wildcard *.cpp) \
-               $(wildcard third_party/*) \
                doc/strip_markdown.pl \
                Makefile \
                $(GENERAL_LIST)
 
-ifeq (1,$(WINDOWS))
-	BIN_PKG_LIST = $(GENERAL_LIST) bowtie2.bat bowtie2-build.bat bowtie2-inspect.bat 
-else
-	BIN_PKG_LIST = $(GENERAL_LIST)
-endif
+BIN_PKG_LIST = $(GENERAL_LIST)
 
 .PHONY: all allall both both-debug
 
